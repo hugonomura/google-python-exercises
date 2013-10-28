@@ -40,8 +40,24 @@ def extract_names(filename):
   followed by the name-rank strings in alphabetical order.
   ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
   """
-  # +++your code here+++
-  return
+  name_rank_list = []
+  f = open(filename, 'r')
+  for line in f:
+    year = re.search(r'name="year"', line)
+    if year:
+      year = re.search(r'value="\d+"', year.string)
+      year = re.search(r'\d+', year.group(0))
+      name_rank_list.append(year.group(0))
+      break;
+  for line in f:
+    names = re.search(r'<td>\d+</td><td>[a-zA-Z]+</td><td>[a-zA-Z]+</td>', line)
+    if names:
+      rank = re.search(r'\d+', names.group(0)).group(0)
+      names = re.split(r'\W+', names.group(0))
+      name_rank_list.append(names[5] + ' ' + str(rank))
+      name_rank_list.append(names[8] + ' ' + str(rank))
+  f.close()
+  return sorted(name_rank_list)
 
 
 def main():
@@ -49,7 +65,7 @@ def main():
   # Make a list of command line arguments, omitting the [0] element
   # which is the script itself.
   args = sys.argv[1:]
-
+  extract_names(sys.argv[1])
   if not args:
     print 'usage: [--summaryfile] file [file ...]'
     sys.exit(1)
@@ -63,6 +79,9 @@ def main():
   # +++your code here+++
   # For each filename, get the names, then either print the text output
   # or write it to a summary file
+  for filename in args:
+    rank = extract_names(filename)
+    print rank
   
 if __name__ == '__main__':
   main()
